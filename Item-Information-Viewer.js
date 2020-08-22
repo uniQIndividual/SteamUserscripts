@@ -4,7 +4,7 @@
 // @icon           https://store.steampowered.com/favicon.ico
 // @updateURL      https://raw.githubusercontent.com/uniQIndividual/SteamUserscripts/master/Item-Information-Viewer.js
 // @description    Displays additional information provided by Steam's API and adds functionality to hidden items
-// @include        ^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{0,20}
+// @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{0,20}/
 // @version        1.0
 // ==/UserScript==
 
