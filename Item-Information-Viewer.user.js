@@ -59,7 +59,7 @@ function getData() {
           '<div class=\"favoriteOption addfavorite selected\">Favorite</div></div></span>';
         text += '<span onclick=\"itemReport();\" id=\"itemReportBtn\" class=\"general_btn report tooltip\">&nbsp;</span>';
         text += (data.creator ? '<span onclick=\"itemComment(\'' + sanitize(data.creator) + '\');\" id=\"ItemCommentBtn\"' +
-        'class=\"general_btn share tooltip\">Comment</span>' : '');
+          'class=\"general_btn share tooltip\">Comment</span>' : '');
         text += '</div></div>';
 
         ShowAlertDialog("Output", text);
