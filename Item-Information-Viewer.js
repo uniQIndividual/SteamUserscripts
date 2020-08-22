@@ -37,7 +37,7 @@ function getData() {
                 break;
               case 'file_size':
                 text += '<b>' + sanitize(key) + '</b>: ' +
-                sanitize(data[key]) + '<span class="bb_link_host">( ' + (sanitize(data[key]) / 1024 / 1024).toFixed(2) + ' MB )</span><br>';
+                  sanitize(data[key]) + '<span class="bb_link_host">( ' + (sanitize(data[key]) / 1024 / 1024).toFixed(2) + ' MB )</span><br>';
                 break;
               case 'time_created':
               case 'time_updated':
@@ -58,6 +58,8 @@ function getData() {
         text += '<span onclick=\"itemFavorite();\" id=\"itemFavoriteBtn\" class=\"general_btn favorite tooltip \"><div class=\"favoriteText\">' +
           '<div class=\"favoriteOption addfavorite selected\">Favorite</div></div></span>';
         text += '<span onclick=\"itemReport();\" id=\"itemReportBtn\" class=\"general_btn report tooltip\">&nbsp;</span>';
+        text += (data.creator ? '<span onclick=\"itemComment(\'' + sanitize(data.creator) + '\');\" id=\"ItemCommentBtn\"' +
+        'class=\"general_btn share tooltip\">Comment</span>' : '');
         text += '</div></div>';
 
         ShowAlertDialog("Output", text);
@@ -110,7 +112,7 @@ function getData() {
 }
 
 function itemReport() {
-  ShowPromptDialog("Repor this item", "Please enter the reason", "Start", "Cancel", "").done((reason) => {
+  ShowPromptDialog("Report this item", "Please enter the reason", "Start", "Cancel", "").done((reason) => {
     $J.post('https://steamcommunity.com/sharedfiles/reportitem', {
       'id': new URL(location.href).searchParams.get("id"),
       'description': reason,
@@ -198,6 +200,43 @@ function itemFavorite() {
   });
 }
 
+function itemComment(userID) {
+  /*ShowPromptDialog("Comment", "Please enter your comment", "Post", "Cancel", "").done((comment) => {
+    $J.post('https://steamcommunity.com/comment/PublishedFile_Public/post/' + userID + '/' + new URL(location.href).searchParams.get("id") + '/', {
+      'comment': comment,
+      'count': '10',
+      'extended_data': JSON.stringify({
+        'contributors': ['\"' + userID + '\"', '\"' + userID + '\"'],
+        'appid': '730',
+        'sharedfile': {
+          'm_parentsDetails': null,
+          'm_parentBundlesDetails': null,
+          'm_bundledChildren': [],
+          'm_ownedBundledItems': []
+        },
+        'parent_item_reported': false
+      }),
+      'feature2': "-1",
+      'sessionid': g_sessionID
+    }).done((result) => {
+      console.log(result);
+      if (result) {
+        if (result.success) {
+          ShowAlertDialog("Comment was posted", "");
+          return;
+        }
+      }
+      ShowAlertDialog('Error', 'There was an error while sending your request.<br>Perhaps you are not logged in or do not have permission?')
+    }).fail((errorMsg) => {
+      console.log(errorMsg);
+      ShowAlertDialog('Error', 'There was an error while sending your request.<br>Perhaps you are not logged in or do not have permission?')
+    });
+
+  });*/
+  console.log(userID);
+  console.log(new URL(location.href).searchParams.get("id"));
+};
+
 function initialize(id) {
   // check for missing Steam libraries
   // not ideal, could be replaced by the actual content
@@ -258,6 +297,7 @@ function initialize(id) {
     itemUpVote.toString() +
     itemDownVote.toString() +
     itemFavorite.toString() +
+    itemComment.toString() +
     "(" + initialize.toString() + ")()";
   document.body.appendChild(script);
 })();
