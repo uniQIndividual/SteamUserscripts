@@ -201,22 +201,9 @@ function itemFavorite() {
 }
 
 function itemComment(userID) {
-  /*ShowPromptDialog("Comment", "Please enter your comment", "Post", "Cancel", "").done((comment) => {
+  ShowPromptDialog("Comment", "Please enter your comment", "Post", "Cancel", "").done((comment) => {
     $J.post('https://steamcommunity.com/comment/PublishedFile_Public/post/' + userID + '/' + new URL(location.href).searchParams.get("id") + '/', {
       'comment': comment,
-      'count': '10',
-      'extended_data': JSON.stringify({
-        'contributors': ['\"' + userID + '\"', '\"' + userID + '\"'],
-        'appid': '730',
-        'sharedfile': {
-          'm_parentsDetails': null,
-          'm_parentBundlesDetails': null,
-          'm_bundledChildren': [],
-          'm_ownedBundledItems': []
-        },
-        'parent_item_reported': false
-      }),
-      'feature2': "-1",
       'sessionid': g_sessionID
     }).done((result) => {
       console.log(result);
@@ -231,8 +218,7 @@ function itemComment(userID) {
       console.log(errorMsg);
       ShowAlertDialog('Error', 'There was an error while sending your request.<br>Perhaps you are not logged in or do not have permission?')
     });
-
-  });*/
+  });
   console.log(userID);
   console.log(new URL(location.href).searchParams.get("id"));
 };
