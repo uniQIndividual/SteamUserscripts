@@ -5,7 +5,7 @@
 // @updateURL      https://github.com/uniQIndividual/SteamUserscripts/raw/master/Item-Information-Viewer.user.js
 // @description    Displays additional information provided by Steam's API and adds functionality to hidden items
 // @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{0,20}/
-// @version        1.1
+// @version        1.2
 // ==/UserScript==
 
 
@@ -39,14 +39,24 @@ function getData() {
                 text += '<b>' + sanitize(key) + '</b>: ' +
                   sanitize(data[key]) + '<span class="bb_link_host">( ' + (sanitize(data[key]) / 1024 / 1024).toFixed(2) + ' MB )</span><br>';
                 break;
+              case 'creator_app_id':
+              case 'consumer_app_id':
+                text += '<b>' + sanitize(key) + '</b>: ' +
+                  sanitize(data[key]) + '<span class="bb_link_host">( <a href=\"https://steamdb.info/app/' +
+                  sanitize(data[key]) + '/\">' + appidLookup(sanitize(data[key])) + '</a> )</span><br>';
+                break;
               case 'time_created':
               case 'time_updated':
                 text += '<b>' + sanitize(key) + '</b>: ' +
                   sanitize(data[key]) + '<span class="bb_link_host">( ' + new Date(sanitize(data[key]) * 1000).toString() + ')</span><br>';
                 break;
-              default:
+              case 'file_url':
+              case 'preview_url':
                 text += '<b>' + sanitize(key) + '</b>: ' +
                   (validURL(data[key]) ? '<a href=\"' + sanitizeURL(data[key]) + '\">' + sanitize(data[key]) + '</a>' : sanitize(data[key])) + '<br>';
+                break;
+              default:
+                text += '<b>' + sanitize(key) + '</b>: ' + sanitize(data[key]) + '<br>';
             }
           }
         }
@@ -87,7 +97,7 @@ function getData() {
         document.body.appendChild(creatorID);
         $('creatorID').innerHTML = data.creator ? sanitize(data.creator) : '';
 
-        let userID = '76561198139364786';
+
         if (data.creator) {
           itemLoadComments(data.creator);
         } else {
@@ -134,6 +144,29 @@ function getData() {
           };
           const reg = /[<>"'`]/ig;
           return string.replace(reg, (match) => (map[match]));
+        }
+
+        function appidLookup(string) {
+          string = string.toString();
+          const map = {
+            "7": 'Steam Client',
+            '440': 'Team Fortress 2',
+            "480": 'Spacewar',
+            '730': 'Counter-Strike: Global Offensive;',
+            '753': 'Steam',
+            "754": 'Steam Economy',
+            "760": 'Steam Screenshots',
+            "765": 'Greenlight',
+            "766": 'Steam Workshop',
+            "767": 'Steam Artwork',
+            "202351": 'Beta Access to the New Steam Community',
+            "248210": 'Game Library Sharing Access',
+            "744350": 'Steam Chat Images',
+            "1016370": 'Steam Forum Images',
+            '1070560': 'Steam Linux Runtime',
+            "1182480": 'TestApp',
+          };
+          return map[string] ? map[string] : 'Look up on SteamDB';
         }
       } catch (e) {
         console.log(e);
