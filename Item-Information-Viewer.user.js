@@ -5,7 +5,7 @@
 // @updateURL      https://github.com/uniQIndividual/SteamUserscripts/raw/master/Item-Information-Viewer.user.js
 // @description    Displays additional information provided by Steam's API and adds functionality to hidden items
 // @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{0,20}/
-// @version        1.0
+// @version        1.1
 // ==/UserScript==
 
 
@@ -342,13 +342,12 @@ function initialize(id) {
     document.head.appendChild(cssWorkshopItem);
   }
 
-  var button = document.createElement('a');
-  button.setAttribute('class', 'btn_darkblue_white_innerfade btn_border_2px btn_medium');
-  button.setAttribute('style', ' margin-top: 10px;');
+  var button = document.createElement('div');
+  button.setAttribute('style', ' width: 100%;');
 
-  button.innerHTML = '<span class="subscribeText" style=\"padding-left: 15px;\">' +
+  button.innerHTML = '<a class=\"btn_darkblue_white_innerfade btn_border_2px btn_medium\" style=\" margin-top: 10px;\"><span class="subscribeText" style=\"padding-left: 15px;\">' +
     '<div class="subscribeOption subscribe selected" id="getDataButton" onClick=\"getData()\">Display more information</div>' +
-    '</span>';
+    '</span></a>';
 
   if ($('message')) { // hidden item
     $('message').append(button);
