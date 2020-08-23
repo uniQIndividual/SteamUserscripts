@@ -21,7 +21,7 @@ function getData() {
       try {
         let data = response.response.publishedfiledetails[0];
         let fileurl = data.file_url;
-        let text = "This are the variables associated with this item.<br>Note that only values from the API are displayed.<br><br>";
+        let text = "These are the variables associated with this item.<br>Note that only values from the API are displayed.<br><br>";
         for (var key in data) {
           if (Object.prototype.toString.call(data[key]) === '[object Array]') {
             text += '<b>' + sanitize(key) + '</b>: [';
@@ -68,9 +68,7 @@ function getData() {
           '</div><div class=\"commentthread_entry_quotebox\"><textarea rows=\"1\" class=\"commentthread_textarea\" id=\"commentthreadItemTextarea\"' +
           ' placeholder=\"Add a comment\" style=\"overflow: hidden; height: 40px;\"></textarea></div><div class=\"commentthread_entry_submitlink\" style=\"\">' +
           '<a class=\"btn_grey_black btn_small_thin\" href=\"javascript:CCommentThread.FormattingHelpPopup( \'PublishedFile_Public\' );\">' +
-          '	<span>Formatting help</span></a>&nbsp;<span class=\"emoticon_container\"><span class=\"emoticon_button small\" id=\"emoticonbtn_item\">' +
-          '</span></span><script type=\"text/javascript\">new CEmoticonPopup( $J(\'emoticonbtn_item\'), $J(\'commentthreadItemTextarea\'),' +
-          '\"https:\/\/steamcommunity.com\" );</script><span class=\"btn_green_white_innerfade btn_small\" \"><span onclick=\"itemComment(\'' +
+          '	<span>Formatting help</span></a>&nbsp;&nbsp;&nbsp;<span class=\"btn_green_white_innerfade btn_small\" \"><span onclick=\"itemComment(\'' +
           (data.creator ? sanitize(data.creator) : '') + '\', $(\'commentthreadItemTextarea\').value);\">Post Comment</span></span>' +
           '</div><div class=\"commentthread_entry_error\" id=\"commentthread_entry_error\"></div></div>';
         text += '<br>' +
