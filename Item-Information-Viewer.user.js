@@ -4,8 +4,8 @@
 // @icon           https://store.steampowered.com/favicon.ico
 // @updateURL      https://github.com/uniQIndividual/SteamUserscripts/raw/master/Item-Information-Viewer.user.js
 // @description    Displays additional information provided by Steam's API and adds functionality to hidden items
-// @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{0,20}/
-// @version        1.2.4
+// @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{1,20}/
+// @version        1.3.0
 // ==/UserScript==
 
 
@@ -44,6 +44,10 @@ function getData() {
                 text += '<b>' + sanitize(key) + '</b>: ' +
                   sanitize(data[key]) + '<span class="bb_link_host">( <a href=\"https://steamdb.info/app/' +
                   sanitize(data[key]) + '/\">' + appidLookup(sanitize(data[key])) + '</a> )</span><br>';
+                break;
+              case 'result':
+                text += '<b>' + sanitize(key) + '</b>: ' +
+                  sanitize(data[key]) + '<span class="bb_link_host">( ' + resultLookup(sanitize(data[key])) + ' )</span><br>';
                 break;
               case 'time_created':
               case 'time_updated':
@@ -194,6 +198,126 @@ function getData() {
             "1182480": 'TestApp',
           };
           return map[string] ? map[string] : 'Look up on SteamDB';
+        }
+
+
+        function resultLookup(string) { // taken from https://steamerrors.com/
+          string = string.toString();
+          const map = {
+            "1": 'OK',
+            "2": 'Fail',
+            "3": 'NoConnection',
+            "5": 'InvalidPassword',
+            "6": 'LoggedInElsewhere',
+            "7": 'InvalidProtocolVer',
+            "8": 'InvalidParam',
+            "9": 'FileNotFound (file type isn\'t supported)',
+            "10": 'Busy',
+            "11": 'InvalidState',
+            "12": 'InvalidName',
+            "13": 'InvalidEmail',
+            "14": 'DuplicateName',
+            "15": 'AccessDenied',
+            "16": 'Timeout',
+            "17": 'Banned',
+            "18": 'AccountNotFound',
+            "19": 'InvalidSteamID',
+            "20": 'ServiceUnavailable',
+            "21": 'NotLoggedOn',
+            "22": 'Pending',
+            "23": 'EncryptionFailure',
+            "24": 'InsufficientPrivilege',
+            "25": 'LimitExceeded',
+            "26": 'Revoked',
+            "27": 'Expired',
+            "28": 'AlreadyRedeemed',
+            "29": 'DuplicateRequest',
+            "30": 'AlreadyOwned',
+            "31": 'IPNotFound',
+            "32": 'PersistFailed',
+            "33": 'LockingFailed',
+            "34": 'LogonSessionReplaced',
+            "35": 'ConnectFailed',
+            "36": 'HandshakeFailed',
+            "37": 'IOFailure',
+            "38": 'RemoteDisconnect',
+            "39": 'ShoppingCartNotFound',
+            "40": 'Blocked',
+            "41": 'Ignored',
+            "42": 'NoMatch',
+            "43": 'AccountDisabled',
+            "44": 'ServiceReadOnly',
+            "45": 'AccountNotFeatured',
+            "46": 'AdministratorOK',
+            "47": 'ContentVersion',
+            "48": 'TryAnotherCM',
+            "49": 'PasswordRequiredToKickSession',
+            "50": 'AlreadyLoggedInElsewhere',
+            "51": 'Suspended',
+            "52": 'Cancelled',
+            "53": 'DataCorruption',
+            "54": 'DiskFull',
+            "55": 'RemoteCallFailed',
+            "56": 'PasswordUnset',
+            "57": 'ExternalAccountUnlinked',
+            "58": 'PSNTicketInvalid',
+            "59": 'ExternalAccountAlreadyLinked',
+            "60": 'RemoteFileConflict',
+            "61": 'IllegalPassword',
+            "62": 'SameAsPreviousValue',
+            "63": 'AccountLogonDenied',
+            "64": 'CannotUseOldPassword',
+            "65": 'InvalidLoginAuthCode',
+            "66": 'AccountLogonDeniedNoMail',
+            "67": 'HardwareNotCapableOfIPT',
+            "68": 'IPTInitError',
+            "69": 'ParentalControlRestricted',
+            "70": 'FacebookQueryError',
+            "71": 'ExpiredLoginAuthCode',
+            "72": 'IPLoginRestrictionFailed',
+            "73": 'AccountLockedDown',
+            "74": 'AccountLogonDeniedVerifiedEmailRequired',
+            "75": 'NoMatchingURL',
+            "76": 'BadResponse',
+            "77": 'RequirePasswordReEntry',
+            "78": 'ValueOutOfRange',
+            "79": 'UnexpectedError',
+            "80": 'Disabled',
+            "81": 'InvalidCEGSubmission',
+            "82": 'RestrictedDevice',
+            "83": 'RegionLocked',
+            "84": 'RateLimitExceeded',
+            "85": 'AccountLoginDeniedNeedTwoFactor',
+            "86": 'ItemDeleted',
+            "87": 'AccountLoginDeniedThrottle',
+            "88": 'TwoFactorCodeMismatch',
+            "89": 'TwoFactorActivationCodeMismatch',
+            "90": 'AccountAssociatedToMultiplePartners',
+            "91": 'NotModified',
+            "92": 'NoMobileDevice',
+            "93": 'TimeNotSynced',
+            "94": 'SmsCodeFailed',
+            "95": 'AccountLimitExceeded',
+            "96": 'AccountActivityLimitExceeded',
+            "97": 'PhoneActivityLimitExceeded',
+            "98": 'RefundToWallet',
+            "99": 'EmailSendFailure',
+            "100": 'NotSettled',
+            "101": 'NeedCaptcha',
+            "102": 'GSLTDenied',
+            "103": 'GSOwnerDenied',
+            "104": 'InvalidItemType',
+            "105": 'IPBanned',
+            "106": 'GSLTExpired',
+            "107": 'InsufficientFunds',
+            "108": 'TooManyPending',
+            "109": 'NoSiteLicensesFound',
+            "110": 'WGNetworkSendExceeded',
+            "111": 'AccountNotFriends',
+            "112": 'LimitedUserAccount',
+            "113": 'CantRemoveItem',
+          };
+          return map[string] ? map[string] : 'unknown';
         }
       } catch (e) {
         ShowAlertDialog("Error", "The request failed.<br>Please check the console log.")
@@ -389,56 +513,61 @@ function itemComment(userID, comment) {
 };
 
 function initialize(id) {
-  // check for missing Steam libraries
-  // not ideal, could be replaced by the actual content
-  function testCSSWorkshop() {
-    var sheets = document.styleSheets,
-      o = {};
-    for (var i = 0; i < sheets.length; i++) {
-      if (sheets[i].href.includes('https://community.cloudflare.steamstatic.com/public/css/skin_1/workshop.css')) {
-        return true;
+  if (/^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{1,20}/.test(location.href)) {
+    // check for missing Steam libraries
+    // not ideal, could be replaced by the actual content
+    function testCSSWorkshop() {
+      var sheets = document.styleSheets,
+        o = {};
+      for (var i = 0; i < sheets.length; i++) {
+        if (sheets[i].href.includes('https://community.cloudflare.steamstatic.com/public/css/skin_1/workshop.css')) {
+          return true;
+        }
       }
+      return false;
     }
-    return false;
-  }
-  if (!testCSSWorkshop()) {
-    var cssWorkshop = document.createElement('link');
-    cssWorkshop.href = 'https://community.cloudflare.steamstatic.com/public/css/skin_1/workshop.css';
-    cssWorkshop.rel = "stylesheet";
-    cssWorkshop.type = "text/css";
-    document.head.appendChild(cssWorkshop);
-  }
+    if (!testCSSWorkshop()) {
+      var cssWorkshop = document.createElement('link');
+      cssWorkshop.href = 'https://community.cloudflare.steamstatic.com/public/css/skin_1/workshop.css';
+      cssWorkshop.rel = "stylesheet";
+      cssWorkshop.type = "text/css";
+      document.head.appendChild(cssWorkshop);
+    }
 
-  function testCSSWorkshopItem() {
-    var sheets = document.styleSheets,
-      o = {};
-    for (var i = 0; i < sheets.length; i++) {
-      if (sheets[i].href.includes('https://community.cloudflare.steamstatic.com/public/css/skin_1/workshop_itemdetails.css')) {
-        return true;
+    function testCSSWorkshopItem() {
+      var sheets = document.styleSheets,
+        o = {};
+      for (var i = 0; i < sheets.length; i++) {
+        if (sheets[i].href.includes('https://community.cloudflare.steamstatic.com/public/css/skin_1/workshop_itemdetails.css')) {
+          return true;
+        }
       }
+      return false;
     }
-    return false;
-  }
-  if (!testCSSWorkshopItem()) {
-    var cssWorkshopItem = document.createElement('link');
-    cssWorkshopItem.href = 'https://community.cloudflare.steamstatic.com/public/css/skin_1/workshop_itemdetails.css';
-    cssWorkshopItem.rel = "stylesheet";
-    cssWorkshopItem.type = "text/css";
-    document.head.appendChild(cssWorkshopItem);
-  }
+    if (!testCSSWorkshopItem()) {
+      var cssWorkshopItem = document.createElement('link');
+      cssWorkshopItem.href = 'https://community.cloudflare.steamstatic.com/public/css/skin_1/workshop_itemdetails.css';
+      cssWorkshopItem.rel = "stylesheet";
+      cssWorkshopItem.type = "text/css";
+      document.head.appendChild(cssWorkshopItem);
+    }
 
-  var button = document.createElement('div');
-  button.setAttribute('style', ' width: 100%;');
+    var button = document.createElement('div');
+    button.setAttribute('style', ' width: 100%;');
 
-  button.innerHTML = '<a class=\"btn_darkblue_white_innerfade btn_border_2px btn_medium\" style=\" margin-top: 10px;\">' +
-    '<span class="subscribeText" style=\"padding-left: 15px;\">' +
-    '<div class="subscribeOption subscribe selected" id="getDataButton" onClick=\"getData()\">Display more information</div>' +
-    '</span></a>';
+    button.innerHTML = '<a class=\"btn_darkblue_white_innerfade btn_border_2px btn_medium\" style=\" margin-top: 10px;\">' +
+      '<span class="subscribeText" style=\"padding-left: 15px;\">' +
+      '<div class="subscribeOption subscribe selected" id="getDataButton" onClick=\"getData()\">Display more information</div>' +
+      '</span></a>';
 
-  if ($('message')) { // hidden item
-    $('message').append(button);
-  } else if ($('ItemControls')) { // regular content
-    $('ItemControls').append(button);
+    if ($('message')) { // hidden item
+      $('message').append(button);
+    } else if ($('ItemControls')) { // regular content
+      $('ItemControls').append(button);
+    }
+  } else {
+    console.error("Steam Item Information Viewer was executed on an invalid page and thus terminated > Only run on " +
+      "https://steamcommunity.com/sharedfiles/filedetails/?id=\\d{1,20}");
   }
 }
 (() => {
