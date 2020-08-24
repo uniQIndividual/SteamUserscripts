@@ -5,7 +5,7 @@
 // @updateURL      https://github.com/uniQIndividual/SteamUserscripts/raw/master/Item-Information-Viewer.user.js
 // @description    Displays additional information provided by Steam's API and adds functionality to hidden items
 // @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{0,20}/
-// @version        1.2.3
+// @version        1.2.4
 // ==/UserScript==
 
 
@@ -99,19 +99,35 @@ function getData() {
 
         if (data.creator) {
           itemLoadComments(data.creator);
-        } else if (document.getElementsByTagName('textarea').length > 1) { // alternative methods of acquiring the creator id
-          if (document.getElementsByTagName('textarea')[1].id.includes('commentthread_PublishedFile')) {
-            $('creatorID').innerHTML = document.getElementsByTagName('textarea')[1].id.match(/\d{17}/)[0]; //
-            itemLoadComments(data.creator);
-          } else {
-            ShowAlertDialog("Output", text);
-            $('storage').innerHTML = '';
-          }
-        } else {
-          console.log('a');
-          ShowAlertDialog("Output", text);
-          $('storage').innerHTML = '';
+          return;
         }
+        // alternative methods of acquiring the creator id
+
+        // from a public comment section
+        if (document.getElementsByClassName('commentthread_area').length > 1) {
+          if (document.getElementsByClassName('commentthread_area')[0].id.includes('commentthread_PublishedFile')) {
+            $('creatorID').innerHTML = document.getElementsByClassName('commentthread_area')[1].id.match(/\d{17}/)[0];
+            itemLoadComments(data.creator);
+            return;
+          }
+        }
+
+        // from listed contributors
+        var listedAccounts = document.getElementsByClassName('friendBlock');
+        if (listedAccounts.length > 0) {
+          let ownerURL = document.getElementsByClassName('breadcrumbs')[0].children[2].href;
+          for (var i = 0; i < listedAccounts.length; i++) {
+            if (ownerURL.includes(listedAccounts[i].children[0].href)) {
+              $('creatorID').innerHTML = 76561197960265728n + BigInt(listedAccounts[i].dataset.miniprofile);
+              itemLoadComments(data.creator);
+              return;
+            }
+          }
+        }
+
+        // if everything else has failed
+        ShowAlertDialog("Output", text);
+        $('storage').innerHTML = '';
 
         function validURL(str) { // from https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
           var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
