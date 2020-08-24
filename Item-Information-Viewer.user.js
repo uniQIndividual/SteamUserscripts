@@ -5,7 +5,7 @@
 // @updateURL      https://github.com/uniQIndividual/SteamUserscripts/raw/master/Item-Information-Viewer.user.js
 // @description    Displays additional information provided by Steam's API and adds functionality to hidden items
 // @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{0,20}/
-// @version        1.2.2
+// @version        1.2.3
 // ==/UserScript==
 
 
@@ -99,7 +99,7 @@ function getData() {
 
         if (data.creator) {
           itemLoadComments(data.creator);
-        } else if (document.getElementsByTagName('textarea') > 1) { // alternative methods of acquiring the creator id
+        } else if (document.getElementsByTagName('textarea').length > 1) { // alternative methods of acquiring the creator id
           if (document.getElementsByTagName('textarea')[1].id.includes('commentthread_PublishedFile')) {
             $('creatorID').innerHTML = document.getElementsByTagName('textarea')[1].id.match(/\d{17}/)[0]; //
             itemLoadComments(data.creator);
@@ -108,6 +108,7 @@ function getData() {
             $('storage').innerHTML = '';
           }
         } else {
+          console.log('a');
           ShowAlertDialog("Output", text);
           $('storage').innerHTML = '';
         }
