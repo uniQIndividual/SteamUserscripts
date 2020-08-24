@@ -5,7 +5,7 @@
 // @updateURL      https://github.com/uniQIndividual/SteamUserscripts/raw/master/Item-Information-Viewer.user.js
 // @description    Displays additional information provided by Steam's API and adds functionality to hidden items
 // @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{0,20}/
-// @version        1.2
+// @version        1.2.1
 // ==/UserScript==
 
 
@@ -97,16 +97,12 @@ function getData() {
         document.body.appendChild(creatorID);
         $('creatorID').innerHTML = data.creator ? sanitize(data.creator) : '';
 
-
         if (data.creator) {
           itemLoadComments(data.creator);
         } else {
           ShowAlertDialog("Output", text);
           $('storage').innerHTML = '';
         }
-
-
-
 
         function validURL(str) { // from https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
           var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
@@ -161,7 +157,13 @@ function getData() {
             "767": 'Steam Artwork',
             "202351": 'Beta Access to the New Steam Community',
             "248210": 'Game Library Sharing Access',
+            "223910": 'Saxxy Awards 2012',
+            "261310": '3rd Annual Saxxy Awards',
+            "321770": '4rd Annual Saxxy Awards',
+            "405270": '5rd Annual Saxxy Awards',
+            "551410": '6rd Annual Saxxy Awards',
             "744350": 'Steam Chat Images',
+            "807210": '7rd Annual Saxxy Awards',
             "1016370": 'Steam Forum Images',
             '1070560': 'Steam Linux Runtime',
             "1182480": 'TestApp',
@@ -169,10 +171,12 @@ function getData() {
           return map[string] ? map[string] : 'Look up on SteamDB';
         }
       } catch (e) {
+        ShowAlertDialog("Error", "The request failed.<br>Please check the console log.")
         console.log(e);
       }
     },
     error: function(reponse) {
+      ShowAlertDialog("Error", "The request failed.<br>Please check the console log.")
       console.log(reponse);
     }
   });
@@ -189,22 +193,27 @@ function itemLoadComments(userID) {
       'count': 50
     }).done((result) => {
       let text = $('storage').innerHTML;
+
+      result.comments_html = result.comments_html.replace(/href=\"javascript:CCommentThread/, '' +
+        'href=\"javascript:setTimeout(itemLoadComments(\'' + result.name.match(/\d{17}/)[0] +
+        '\'), 1500 );CCommentThread'); // ensure the overlay is refreshed on comment deletion
+
       if (result.success) {
-        //$('itemCommentSection').innerHTML = result.comments_html;
         result.comments_html = result.comments_html == "" ? "<span class=\"bb_link_host\">(No comments were found)</span>" : result.comments_html;
-        text = text.slice(0, text.indexOf('id=\"itemCommentSection\">') + 24) + result.comments_html +
-          text.slice(text.indexOf('id=\"itemCommentSection\">') + 24);
       } else {
         result.comments_html = "<span class=\"bb_link_host\">(There was an error loading the comments)</span>";
-        text = text.slice(0, text.indexOf('id=\"itemCommentSection\">') + 24) + result.comments_html +
-          text.slice(text.indexOf('id=\"itemCommentSection\">') + 24);
       }
+
+      text = text.slice(0, text.indexOf('id=\"itemCommentSection\">') + 24) + result.comments_html +
+        text.slice(text.indexOf('id=\"itemCommentSection\">') + 24);
       if (document.getElementsByClassName('newmodal_content').length > 0) { //dismiss older overlays
         document.getElementsByClassName('newmodal_background')[0].click()
       }
+
       ShowAlertDialog("Output", text);
       $('storage').innerHTML = '';
     }).fail((errorMsg) => {
+      let text = $('storage').innerHTML;
       console.log("Could not retrive comments");
       console.log(errorMsg);
       if (document.getElementsByClassName('newmodal_content').length > 0) {
@@ -214,10 +223,19 @@ function itemLoadComments(userID) {
       $('storage').innerHTML = '';
     });
   } else {
-    ShowPromptDialog("Comments", "The script couldn't find the creator.<br>Please enter the Steam64ID of the item creator:",
-      "Load comments", "Cancel").done((input) => {
-      itemLoadComments(input);
-    });
+    if ($('creatorID').innerHTML == '') {
+      ShowPromptDialog("Comments", "The script couldn't find the creator.<br>Please enter the Steam64ID of the item creator:",
+        "Load comments", "Cancel").done((input) => {
+        if (/^\d{17}$/.test(input)) {
+          $('creatorID').innerHTML = input;
+          itemLoadComments(input);
+        } else {
+          itemLoadComments();
+        }
+      });
+    } else {
+      itemLoadComments($('creatorID').innerHTML);
+    }
   }
 }
 
@@ -311,8 +329,7 @@ function itemFavorite() {
 }
 
 function itemComment(userID, comment) {
-  console.log(userID, comment);
-  if (userID) {
+  if (userID != undefined && userID != '') {
     $J.post('https://steamcommunity.com/comment/PublishedFile_Public/post/' + userID + '/' + new URL(location.href).searchParams.get("id") + '/', {
       'comment': comment,
       'sessionid': g_sessionID
@@ -329,10 +346,20 @@ function itemComment(userID, comment) {
       ShowAlertDialog('Error', 'There was an error while sending your request.<br>Perhaps you are not logged in or do not have permission?')
     });
   } else {
-    ShowPromptDialog("Comments", "The script couldn't find the creator.<br>Please enter the Steam64ID of the item creator:",
-      "Add comment", "Cancel").done((input) => {
-      itemComment(input, comment);
-    });
+
+    if ($('creatorID').innerHTML == '') {
+      ShowPromptDialog("Comments", "The script couldn't find the creator.<br>Please enter the Steam64ID of the item creator:",
+        "Add comment", "Cancel").done((input) => {
+        if (/^\d{17}$/.test(input)) {
+          $('creatorID').innerHTML = input;
+          itemComment(input, comment);
+        } else {
+          itemComment('', comment);
+        }
+      });
+    } else {
+      itemComment($('creatorID').innerHTML, comment);
+    }
   }
 };
 
@@ -378,7 +405,8 @@ function initialize(id) {
   var button = document.createElement('div');
   button.setAttribute('style', ' width: 100%;');
 
-  button.innerHTML = '<a class=\"btn_darkblue_white_innerfade btn_border_2px btn_medium\" style=\" margin-top: 10px;\"><span class="subscribeText" style=\"padding-left: 15px;\">' +
+  button.innerHTML = '<a class=\"btn_darkblue_white_innerfade btn_border_2px btn_medium\" style=\" margin-top: 10px;\">' +
+    '<span class="subscribeText" style=\"padding-left: 15px;\">' +
     '<div class="subscribeOption subscribe selected" id="getDataButton" onClick=\"getData()\">Display more information</div>' +
     '</span></a>';
 
