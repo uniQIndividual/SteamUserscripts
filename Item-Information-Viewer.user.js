@@ -5,7 +5,7 @@
 // @updateURL      https://github.com/uniQIndividual/SteamUserscripts/raw/master/Item-Information-Viewer.user.js
 // @description    Displays additional information provided by Steam's API and adds functionality to hidden items
 // @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{1,20}/
-// @version        1.3.0
+// @version        1.3.1
 // ==/UserScript==
 
 
@@ -118,7 +118,11 @@ function getData() {
 
         // from listed contributors
         var listedAccounts = document.getElementsByClassName('friendBlock');
-        if (listedAccounts.length > 0) {
+        if (listedAccounts.length == 1) {
+          $('creatorID').innerHTML = 76561197960265728n + BigInt(listedAccounts[0].dataset.miniprofile);
+          itemLoadComments(data.creator);
+          return;
+        } else if (listedAccounts.length > 1 && document.getElementsByClassName('breadcrumbs')[0].children.length > 1) {
           let ownerURL = document.getElementsByClassName('breadcrumbs')[0].children[2].href;
           for (var i = 0; i < listedAccounts.length; i++) {
             if (ownerURL.includes(listedAccounts[i].children[0].href)) {
