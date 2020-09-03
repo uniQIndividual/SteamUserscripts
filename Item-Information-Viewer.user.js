@@ -4,8 +4,8 @@
 // @icon           https://store.steampowered.com/favicon.ico
 // @updateURL      https://github.com/uniQIndividual/SteamUserscripts/raw/master/Item-Information-Viewer.user.js
 // @description    Displays additional information provided by Steam's API and adds functionality to hidden items
-// @include        /^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{1,20}/
-// @version        1.3.1
+// @include        /^https:\/\/steamcommunity\.com\/(sharedfiles|workshop)\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{1,20}/
+// @version        1.3.2
 // ==/UserScript==
 
 
@@ -147,7 +147,7 @@ function getData() {
           return !!pattern.test(str);
         };
 
-        function sanitize(string) { // very basic sanitizion in case Steam does not properly sanitize their output
+        function sanitize(string) { // very basic sanitizion in case Steam does not sanitize their output somewhere
           // using https://stackoverflow.com/questions/2794137/sanitizing-user-input-before-adding-it-to-the-dom-in-javascript/48226843#48226843
           string = string.toString();
           const map = {
@@ -347,11 +347,11 @@ function itemLoadComments(userID) {
     }).done((result) => {
       let text = $('storage').innerHTML;
 
-      result.comments_html = result.comments_html.replace(/href=\"javascript:CCommentThread/, '' +
-        'href=\"javascript:setTimeout(itemLoadComments(\'' + result.name.match(/\d{17}/)[0] +
-        '\'), 1500 );CCommentThread'); // ensure the overlay is refreshed on comment deletion
 
       if (result.success) {
+        result.comments_html = result.comments_html.replace(/href=\"javascript:CCommentThread/, '' +
+          'href=\"javascript:setTimeout(itemLoadComments(\'' + result.name.match(/\d{17}/)[0] +
+          '\'), 1500 );CCommentThread'); // ensure the overlay is refreshed on comment deletion
         result.comments_html = result.comments_html == "" ? "<span class=\"bb_link_host\">(No comments were found)</span>" : result.comments_html;
       } else {
         result.comments_html = "<span class=\"bb_link_host\">(There was an error loading the comments)</span>";
@@ -517,7 +517,7 @@ function itemComment(userID, comment) {
 };
 
 function initialize(id) {
-  if (/^https:\/\/steamcommunity\.com\/sharedfiles\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{1,20}/.test(location.href)) {
+  if (/^https:\/\/steamcommunity\.com\/(sharedfiles|workshop)\/filedetails\/\?((\d|\w)+=(\d|\w)*&)*id=\d{1,20}/.test(location.href)) {
     // check for missing Steam libraries
     // not ideal, could be replaced by the actual content
     function testCSSWorkshop() {
@@ -571,7 +571,7 @@ function initialize(id) {
     }
   } else {
     console.error("Steam Item Information Viewer was executed on an invalid page and thus terminated > Only run on " +
-      "https://steamcommunity.com/sharedfiles/filedetails/?id=\\d{1,20}");
+      "https://steamcommunity.com/(sharedfiles|workshop)/filedetails/?id=\\d{1,20}");
   }
 }
 (() => {
